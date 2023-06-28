@@ -30,8 +30,10 @@ def set_mpl_rcParams(**kwargs):
         "ytick.minor.width": 0.375,
         "lines.linewidth": 0.75,  # 画线粗细
         "lines.markersize": 3,  # 画线时点标记大小
-        "grid.linewidth": 0.5,  # 网格线粗细
         "grid.linestyle": "--",  # 网格线类型
+        "grid.linewidth": 0.5,  # 网格线粗细
+        "hatch.color": "grey",
+        "hatch.linewidth": 0.2
     }
 
     # 将修改的参数赋值给默认参数
@@ -61,4 +63,9 @@ def printdf(df):
         for column_name in column_names:
             table.add_column(column_name, df[column_name].values)
     print(table)
+    return
+
+
+def printHello():
+    print("Hello")
     return
