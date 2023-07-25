@@ -1,1 +1,1 @@
-__all__ = ['style', 'tools']
+__all__ = ['style', 'tools', 'hessian_scale']

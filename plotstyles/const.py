@@ -14,5 +14,3 @@ class _const:
             raise self.ConstError("Can't rebind const (%s)" %name)
         self.__dict__[name]=value
         
-import sys
-sys.modules[__name__]=_const()
