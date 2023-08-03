@@ -51,7 +51,7 @@ class HessianScale(ScaleBase):
     """
     name = 'hessian'
 
-    def __init__(self, axis, base_p=0.01, subs=None):
+    def __init__(self, axis, base_p=0.0001, subs=None):
         """
         Parameters
         ----------
