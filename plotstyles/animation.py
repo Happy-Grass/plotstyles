@@ -28,7 +28,7 @@ class UpdateFrame:
             self.__set_data = self.__artist.set_offsets
         else:
             raise TypeError("A wrong plot type!")
-        
+
     def __call__(self, data):
         """
         @params: data must be formatted as a tuple.
@@ -49,7 +49,7 @@ class UpdateFrame:
         self.__ax.set_xlim(xmin, xmax)
         self.__ax.set_ylim(ymin, ymax)
         return self.__artist
-    
+
     def get_artist_num(self):
         return len(self.__artist)
 
@@ -81,5 +81,3 @@ if __name__ == "__main__":
     # ani.save("line.mp4")
     plt.pause(1)
     plt.show()
-    
-

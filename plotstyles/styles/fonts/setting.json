@@ -1,0 +1,47 @@
+{
+    "serif": ["Times New Roman", "SimSun"],
+    "sans-serif": ["Arial"],
+    "fontproperties":[
+        {
+            "name": "title",
+            "fname": "./plotstyles/styles/fonts/simhei.ttf",
+            "family": "serif",
+            "style": "normal",
+            "variant": "normal",
+            "stretch": "normal",
+            "weight": "normal",
+            "size": "12",
+            "math_fontfamily": "dejavusans"
+        },
+        {
+            "name": "axis_label",
+            "family": "sans-serif",
+            "style": "normal",
+            "variant": "normal",
+            "stretch": "normal",
+            "weight": "bold",
+            "size": "12",
+            "math_fontfamily": "dejavusans"
+        },
+        {
+            "name": "ticks_label",
+            "family": "serif",
+            "style": "normal",
+            "variant": "normal",
+            "stretch": "normal",
+            "weight": "normal",
+            "size": "12",
+            "math_fontfamily": "dejavusans"
+        },
+        {
+            "name": "legend",
+            "family": "serif",
+            "style": "normal",
+            "variant": "normal",
+            "stretch": "normal",
+            "weight": "normal",
+            "size": "12",
+            "math_fontfamily": "dejavusans"
+        }
+    ]
+}

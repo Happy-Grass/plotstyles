@@ -53,14 +53,13 @@ def get_color_list(name):
 def set_xscale(ax, scale_name=None):
     if scale_name == None:
         print("Please assign a value to the variable scale_name!")
-    
     if scale_name == 'Hessian':
         def forward(x):
             return norm.ppf(x) - norm.ppf(0.0001)
-        
+
         def inverse(x):
             return norm.cdf(x + norm.ppf(0.00001))
-        
+
         ax.set_xscale('function', functions=(forward, inverse))
 
     else:
@@ -115,4 +114,4 @@ def get_value4p3(p, X_avg, C_v, C_s):
     return solver(func=func, x0=0, x1=a0 + 10)
 
 
-#-----------------------------------------------------------------------------------------------  
+#-----------------------------------------------------------------------------------------------
