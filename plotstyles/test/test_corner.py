@@ -1,8 +1,9 @@
 import numpy as np
 from plotstyles.figure import Figure
 from plotstyles.fonts import global_fonts
-
 # Set up the parameters of the problem.
+import matplotlib.style as style
+
 ndim, nsamples = 3, 50000
 
 # Generate some fake data.

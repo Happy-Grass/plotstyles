@@ -8,6 +8,7 @@ import tkinter as tk
 import ctypes
 from matplotlib.widgets import Slider
 import corner
+from plotstyles.visualization.taylor.taylor_diagram import TaylorDiagram
 
 class MultiSlider:
     def __init__(self, ax, func, variables:dict={'k':[0, 1, 0.1]}, **kwargs):
@@ -349,12 +350,28 @@ class Figure(MatFigure):
                         coords=coords, divergences=divergences, divergences_kwargs=divergences_kwargs,
                         labeller=labeller, hist2d_kwargs=hist2d_kwargs)
         return
+    
+    def taylor_plot(self, ax, reference, simulations, Normalize=False, markers=[], colors=[], scale=1.5,
+                    markersize=2, pkwargs={}, reference_name='Observations', simulations_name=None,
+                    legend=False, r_linewidth=1, r_linecolor='k', r_linestyle='--', ref_std_linewidth=1.5,
+                    ref_std_linecolor='k', ref_std_linestyle='-', rmse_linewidth=0.75, rmse_linecolor='grey',
+                    rmse_linestyle='--'):
+        TaylorDiagram(ax, reference, simulations, Normalize=Normalize, markers=markers,
+                      colors=colors, scale=scale, markersize=markersize, pkwargs=pkwargs,
+                      reference_name=reference_name, simulations_name=simulations_name, legend=legend,
+                      r_linewidth=r_linewidth, r_linecolor=r_linecolor,
+                      r_linestyle=r_linestyle, ref_std_linewidth=ref_std_linewidth,
+                      ref_std_linecolor=ref_std_linecolor, ref_std_linestyle=ref_std_linestyle,
+                      rmse_linewidth=rmse_linewidth, rmse_linecolor=rmse_linecolor, rmse_linestyle=rmse_linestyle)
 
   
 if __name__ == "__main__":  
     fig = Figure()
-    ax = fig.add_axes_cm("Test", 2, 3, 6, 4)
-    ax2 = fig.add_axes_cm("Demo", 3, 4, 3, 4)
-    fig.axes_dict["Test"].plot([4, 6, 7, 8, 9])
+    ax = fig.add_axes_cm("Test", 2, 1, 6, 6)
+    import pandas as pd
+    df = pd.DataFrame({"a": [1, 2, 3, 4, 5], "b": [2, 3, 4, 7, 6], "c": [2, 3, 4, 6, 9]})
+
+    # ax2 = fig.add_axes_cm("Demo", 3, 4, 3, 4)
+    fig.taylor_plot(ax, df.iloc[:, 0].values, df.iloc[:, 1:].values)
     fig.resize(16, 8)
     fig.show()
