@@ -1,0 +1,140 @@
+axes.facecolor:     white   # axes background color
+axes.edgecolor:     black   # axes edge color
+
+
+axes.titlelocation: left  # alignment of the title: {left, right, center}
+axes.titlesize:     10   # font size of the axes title
+axes.titleweight:   normal  # font weight of title
+axes.titlecolor:    black    # color of the axes title, auto falls back to
+axes.titley:        1    # position title (axes relative units).  None implies auto
+axes.titlepad:      5     # pad between axes and title in points
+
+# label
+axes.labelsize:     10  # font size of the x and y labels
+axes.labelpad:      4.0     # space between label and axis
+axes.labelweight:   normal  # weight of the x and y labels
+axes.labelcolor:    black
+axes.axisbelow:     line    # draw axis gridlines and ticks:
+                             #     - below patches (True)
+                             #     - above patches but below lines ('line')
+                             #     - above all (False)
+
+axes.formatter.limits: -2, 3  # use scientific notation if log10
+                               # of the axis range is smaller than the
+                               # first or larger than the second
+axes.formatter.use_locale: False  # When True, format tick labels
+                                   # according to the user's locale.
+                                   # For example, use ',' as a decimal
+                                   # separator in the fr_FR locale.
+axes.formatter.use_mathtext: False  # When True, use mathtext for scientif notation.
+axes.formatter.min_exponent: 0  # minimum exponent to format in scientific notation
+axes.formatter.useoffset: True  # If True, the tick label formatter
+                                 # will default to labeling ticks relative
+                                 # to an offset when the data range is
+                                 # small compared to the minimum absolute
+                                 # value of the data.
+axes.formatter.offset_threshold: 4  # When useoffset is True, the offset
+                                     # will be used when it can remove
+                                     # at least this number of significant
+                                     # digits from tick labels.
+# spines
+axes.spines.left:   True  # display axis spines
+axes.spines.bottom: True
+axes.spines.top:    True
+axes.spines.right:  True
+axes.linewidth: 1
+
+axes.unicode_minus: True  # use Unicode for the minus symbol rather than hyphen.  See
+                           # https://en.wikipedia.org/wiki/Plus_and_minus_signs#Character_codes
+axes.xmargin:   .05  # x margin.  See `axes.Axes.margins`
+axes.ymargin:   .05  # y margin.  See `axes.Axes.margins`
+axes.zmargin:   .05  # z margin.  See `axes.Axes.margins`
+axes.autolimit_mode: round_numbers  # If "data", use axes.xmargin and axes.ymargin as is.
+                            # If "round_numbers", after application of margins, axis
+                            # limits are further expanded to the nearest "round" number.
+
+## ***************************************************************************
+## * AXIS                                                                    *
+## ***************************************************************************
+xaxis.labellocation: center  # alignment of the xaxis label: {left, right, center}
+yaxis.labellocation: center  # alignment of the yaxis label: {bottom, top, center}
+
+
+## ***************************************************************************
+## * DATES                                                                   *
+## ***************************************************************************
+## These control the default format strings used in AutoDateFormatter.
+## Any valid format datetime format string can be used (see the python
+## `datetime` for details).  For example, by using:
+##     - '%x' will use the locale date representation
+##     - '%X' will use the locale time representation
+##     - '%c' will use the full locale datetime representation
+## These values map to the scales:
+##     {'year': 365, 'month': 30, 'day': 1, 'hour': 1/24, 'minute': 1 / (24 * 60)}
+
+#date.autoformatter.year:        %Y
+#date.autoformatter.month:       %Y-%m
+#date.autoformatter.day:         %Y-%m-%d
+#date.autoformatter.hour:        %m-%d %H
+#date.autoformatter.minute:      %d %H:%M
+#date.autoformatter.second:      %H:%M:%S
+#date.autoformatter.microsecond: %M:%S.%f
+## The reference date for Matplotlib's internal date representation
+## See https://matplotlib.org/stable/gallery/ticks/date_precision_and_epochs.html
+#date.epoch: 1970-01-01T00:00:00
+## 'auto', 'concise':
+#date.converter:                  auto
+## For auto converter whether to use interval_multiples:
+#date.interval_multiples:         True
+
+## ***************************************************************************
+## * TICKS                                                                   *
+## ***************************************************************************
+xtick.top:           False   # draw ticks on the top side
+xtick.bottom:        True    # draw ticks on the bottom side
+xtick.color:         black   # color of the ticks
+xtick.labeltop:      False   # draw label on the top
+xtick.labelbottom:   True    # draw label on the bottom
+xtick.labelcolor:    inherit # color of the tick labels or inherit from xtick.color
+xtick.labelsize:     8  # font size of the tick labels
+xtick.direction:     out     # direction: {in, out, inout}
+xtick.alignment:     center  # alignment of xticks
+
+xtick.major.size:    6     # major tick size in points
+xtick.major.width:   0.75     # major tick width in points
+xtick.major.pad:     3.5     # distance to major tick label in points
+xtick.major.top:     True    # draw x axis top major ticks
+xtick.major.bottom:  True    # draw x axis bottom major ticks
+
+xtick.minor.size:    3       # minor tick size in points
+xtick.minor.width:   0.5     # minor tick width in points
+xtick.minor.pad:     3.4     # distance to the minor tick label in points
+xtick.minor.visible: True   # visibility of minor ticks on x-axis
+xtick.minor.top:     True    # draw x axis top minor ticks
+xtick.minor.bottom:  True    # draw x axis bottom minor ticks
+xtick.minor.ndivs:   auto    # number of minor ticks between the major ticks on x-axis
+
+ytick.left:          True    # draw ticks on the left side
+ytick.right:         False   # draw ticks on the right side
+ytick.color:         black   # color of the ticks
+ytick.direction:     out     # direction: {in, out, inout}
+ytick.alignment:     center_baseline  # alignment of yticks
+
+ytick.labelleft:     True    # draw tick labels on the left side
+ytick.labelright:    False   # draw tick labels on the right side
+ytick.labelcolor:    inherit # color of the tick labels or inherit from ytick.color
+ytick.labelsize:     8  # font size of the tick labels
+
+ytick.major.left:    True    # draw y axis left major ticks
+ytick.major.right:   True    # draw y axis right major ticks
+ytick.major.size:    6     # major tick size in points
+ytick.major.width:   0.75     # major tick width in points
+ytick.major.pad:     3.5     # distance to major tick label in points
+
+ytick.minor.left:    True    # draw y axis left minor ticks
+ytick.minor.right:   True    # draw y axis right minor ticks
+ytick.minor.size:    3       # minor tick size in points
+ytick.minor.width:   0.5     # minor tick width in points
+ytick.minor.pad:     3.4     # distance to the minor tick label in points
+ytick.minor.visible: True   # visibility of minor ticks on y-axis
+ytick.minor.ndivs:   auto    # number of minor ticks between the major ticks on y-axis
