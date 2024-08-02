@@ -1,17 +1,19 @@
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure as MatFigure
 from typing import Iterable, Literal
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
-                                               NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.backend_bases import key_press_handler
-import tkinter as tk  
+import tkinter as tk
 import ctypes
 from matplotlib.widgets import Slider
 import corner
 from plotstyles.visualization.taylor.taylor_diagram import TaylorDiagram
+from matplotlib.patches import ConnectionPatch
+import math
+
 
 class MultiSlider:
-    def __init__(self, ax, func, variables:dict={'k':[0, 1, 0.1]}, **kwargs):
+    def __init__(self, ax, func, variables: dict = {"k": [0, 1, 0.1]}, **kwargs):
         self.func = func
         self.items = {}
         subax_height = 1 / (len(variables) * 1.5 - 0.5)
@@ -19,7 +21,7 @@ class MultiSlider:
             subax = ax.inset_axes([0.1, 1.5 * i * subax_height, 0.8, subax_height])
             subax.xaxis.set_visible(False)
             subax.yaxis.set_visible(False)
-            for spine in ['top', 'right', 'bottom', 'left']:
+            for spine in ["top", "right", "bottom", "left"]:
                 subax.spines[spine].set_visible(False)
             valmin, valmax, valstep = value
             slider = Slider(subax, key, valmin=valmin, valmax=valmax, valstep=valstep)
@@ -27,7 +29,7 @@ class MultiSlider:
             slider.on_changed(self.__silder_func)
         ax.xaxis.set_visible(False)
         ax.yaxis.set_visible(False)
-    
+
     def __silder_func(self, value):
         # value 对于单个button没有用,调用综合button
         args = []
@@ -51,7 +53,7 @@ class Figure(MatFigure):
         constrained_layout=None,
         layout=None,
         number=1,
-        **kwargs
+        **kwargs,
     ):
         # 尺寸转化为cm
         self.width = width * 0.3937
@@ -67,72 +69,90 @@ class Figure(MatFigure):
             tight_layout=tight_layout,
             constrained_layout=constrained_layout,
             layout=layout,
-            **kwargs
+            **kwargs,
         )
         self.axes_dict = {}
-        self.number = number # 用于辅助plot显示图形管理fig
+        self.number = number  # 用于辅助plot显示图形管理fig
 
-    def add_axes_cm(self, name, loc_x, loc_y, width, height, 
-                    anchor:Literal['left bottom', 'left upper', 'right bottom', 'right upper'] ='left bottom'):
+    def add_axes_cm(
+        self,
+        name,
+        loc_x,
+        loc_y,
+        width,
+        height,
+        anchor: Literal[
+            "left bottom", "left upper", "right bottom", "right upper"
+        ] = "left bottom",
+        **kwargs
+    ):
         """
         添加ax,按照常用的那种cm布局, 左下角为0cm, 0cm; 右上角为 width, height
         loc_x, loc_y随着anchor的变化而变化，如果是left bottom就是左下角，如果是right upper就是右上角
         """
-        loc_x, loc_y, width, height = loc_x * 0.3937, loc_y * 0.3937, width * 0.3937, height * 0.3937
+        loc_x, loc_y, width, height = (
+            loc_x * 0.3937,
+            loc_y * 0.3937,
+            width * 0.3937,
+            height * 0.3937,
+        )
         width = width / self.width
         height = height / self.height
-        if(anchor=='left bottom'):
+        if anchor == "left bottom":
             left = loc_x / self.width
-            bottom = loc_y /self.height
-        elif(anchor=='left upper'):
+            bottom = loc_y / self.height
+        elif anchor == "left upper":
             left = loc_x / self.width
-            bottom = 1 - loc_y / self.height - height  
-        elif(anchor=='right bottom'):
+            bottom = 1 - loc_y / self.height - height
+        elif anchor == "right bottom":
             left = 1 - loc_x / self.width - width
             bottom = loc_y / self.height
-        elif(anchor=='right upper'):
+        elif anchor == "right upper":
             left = 1 - loc_x / self.width - width
-            bottom = 1 - loc_y/ self.height - height
-        elif(isinstance(anchor, tuple) and len(anchor)==2 and all([isinstance(item, float) for item in anchor])):
+            bottom = 1 - loc_y / self.height - height
+        elif (
+            isinstance(anchor, tuple)
+            and len(anchor) == 2
+            and all([isinstance(item, float) for item in anchor])
+        ):
             start_x, start_y = anchor
             left = start_x + loc_x / self.width
             bottom = start_y + loc_y / self.height
         else:
             raise ValueError
-        ax = self.add_axes([left, bottom, width, height])
+        ax = self.add_axes([left, bottom, width, height], **kwargs)
         self.axes_dict[name] = ax
         return ax
 
     def resize(self, width, height):
         self.set_size_inches(width * 0.3937, height * 0.3937)
         return
-    
+
     def show(self):
 
         # 高分屏绘制防止模糊
         ctypes.windll.shcore.SetProcessDpiAwareness(1)
-        scale_factor=ctypes.windll.shcore.GetScaleFactorForDevice(0)
+        scale_factor = ctypes.windll.shcore.GetScaleFactorForDevice(0)
 
         window = tk.Tk()
-        window.tk.call('tk', 'scaling', scale_factor/80)
-        window.wm_title("Matplotlib")  
+        window.tk.call("tk", "scaling", scale_factor / 80)
+        window.wm_title("Matplotlib")
 
-
-        canvas = FigureCanvasTkAgg(self, master=window)  
+        canvas = FigureCanvasTkAgg(self, master=window)
         toolbar = NavigationToolbar2Tk(canvas, window, pack_toolbar=False)
         canvas.mpl_connect(
-            "key_press_event", lambda event: print(f"you pressed {event.key}"))
+            "key_press_event", lambda event: print(f"you pressed {event.key}")
+        )
         canvas.mpl_connect("key_press_event", key_press_handler)
 
         toolbar.pack(side=tk.TOP, fill=tk.X)
-        widget = canvas.get_tk_widget()  
-        widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True)  
+        widget = canvas.get_tk_widget()
+        widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         window.mainloop()
 
     def align_ylabels_coords(self, axes, x, y):
         for ax in axes:
             ax.yaxis.set_label_coords(x, y, transform=ax.transAxes)
-    
 
     def align_xlabels_coords(self, axes, x, y):
         """
@@ -142,35 +162,137 @@ class Figure(MatFigure):
             ax.xaxis.set_label_coords(x, y, transform=ax.transAxes)
         return
 
-    def corner_plot(self, data, bins=20, *, range=None,
-                    axes_scale="linear", weights=None, color=None, 
-                    hist_bin_factor=1, smooth=None,
-                    smooth1d=None, labels=None,
-                    label_kwargs=None, titles=None, show_titles=False,
-                    title_quantiles=None,
-                    title_fmt=".2f",
-                    title_kwargs=None,
-                    truths=None,
-                    truth_color="#4682b4",
-                    scale_hist=False,
-                    quantiles=None,
-                    verbose=False,
-                    fig=None,
-                    max_n_ticks=5,
-                    top_ticks=False,
-                    use_math_text=False,
-                    reverse=False,
-                    labelpad=0.0,
-                    hist_kwargs=None,
-                    # Arviz parameters
-                    group="posterior",
-                    var_names=None,
-                    filter_vars=None,
-                    coords=None,
-                    divergences=False,
-                    divergences_kwargs=None,
-                    labeller=None,
-                    **hist2d_kwargs):
+    def plot_line_between_2ax(
+        self,
+        xy1: tuple,
+        xy2: tuple,
+        ax1=None,
+        ax2=None,
+        coords1="data",
+        coords2="data",
+        color="k",
+        linestyle="solid",
+        linewidth=1,
+        **kwargs
+    ):
+        """*coordsA* and *coordsB* are strings that indicate the
+        coordinates of *xyA* and *xyB*.
+
+        ==================== ==================================================
+        Property             Description
+        ==================== ==================================================
+        'figure points'      points from the lower left corner of the figure
+        'figure pixels'      pixels from the lower left corner of the figure
+        'figure fraction'    0, 0 is lower left of figure and 1, 1 is upper
+                            right
+        'subfigure points'   points from the lower left corner of the subfigure
+        'subfigure pixels'   pixels from the lower left corner of the subfigure
+        'subfigure fraction' fraction of the subfigure, 0, 0 is lower left.
+        'axes points'        points from lower left corner of the Axes
+        'axes pixels'        pixels from lower left corner of the Axes
+        'axes fraction'      0, 0 is lower left of Axes and 1, 1 is upper right
+        'data'               use the coordinate system of the object being
+                            annotated (default)
+        'offset points'      offset (in points) from the *xy* value
+        'polar'              you can specify *theta*, *r* for the annotation,
+                            even in cartesian plots.  Note that if you are
+                            using a polar Axes, you do not need to specify
+                            polar for the coordinate system since that is the
+                            native "data" coordinate system.
+        ==================== ==================================================
+        """
+        con = ConnectionPatch(
+            xy1,
+            xy2,
+            coordsA=coords1,
+            coordsB=coords2,
+            axesA=ax1,
+            axesB=ax2,
+            color=color,
+            ls=linestyle,
+            linewidth=linewidth,
+            **kwargs
+        )
+        self.add_artist(con)
+        return
+
+    
+    def line_annoate_text(self, ax, xy1: tuple, xy2: tuple, text: str, transform=None):
+        if transform is None:
+            transform = ax.transData
+            coords = 'data'
+        if transform == ax.transAxes:
+            coords = 'axes fraction'
+        theta = math.degrees(math.atan((xy2[1] - xy1[1]) / (xy2[0] - xy1[0])))
+        mid_x = (xy1[0] + xy2[0]) / 2
+        mid_y = (xy1[1] + xy2[1]) / 2
+        ax.annotate(
+            "",
+            xy=xy1,
+            xytext=xy2,
+            arrowprops=dict(arrowstyle="<->", shrinkA=0, shrinkB=0, facecolor="k", linewidth=0.5),
+            xycoords=transform,
+            textcoords=transform,
+        )
+        ax.text(
+            mid_x,
+            mid_y,
+            text,
+            ha="center",
+            va="center",
+            rotation=theta,
+            rotation_mode="anchor",
+            transform_rotates_text=True,
+            bbox=dict(
+                boxstyle="square",
+                ec=(1, 1, 1),
+                fc=(1, 1, 1),
+            ),
+            transform=transform
+        )
+        return None
+
+    def corner_plot(
+        self,
+        data,
+        bins=20,
+        *,
+        range=None,
+        axes_scale="linear",
+        weights=None,
+        color=None,
+        hist_bin_factor=1,
+        smooth=None,
+        smooth1d=None,
+        labels=None,
+        label_kwargs=None,
+        titles=None,
+        show_titles=False,
+        title_quantiles=None,
+        title_fmt=".2f",
+        title_kwargs=None,
+        truths=None,
+        truth_color="#4682b4",
+        scale_hist=False,
+        quantiles=None,
+        verbose=False,
+        fig=None,
+        max_n_ticks=5,
+        top_ticks=False,
+        use_math_text=False,
+        reverse=False,
+        labelpad=0.0,
+        hist_kwargs=None,
+        # Arviz parameters
+        group="posterior",
+        var_names=None,
+        filter_vars=None,
+        coords=None,
+        divergences=False,
+        divergences_kwargs=None,
+        labeller=None,
+        **hist2d_kwargs,
+    ):
         """
         Make a *sick* corner plot showing the projections of a data set in a
         multi-dimensional space. kwargs are passed to hist2d() or used for
@@ -333,43 +455,109 @@ class Figure(MatFigure):
         **hist2d_kwargs
             Any remaining keyword arguments are sent to :func:`corner.hist2d` to
             generate the 2-D histogram plots.
-        Returns 
+        Returns
         """
-        if(len(self.axes_dict) !=0):
+        if len(self.axes_dict) != 0:
             raise RuntimeError("Corner_plot should be used in a clean figure")
         if fig is None:
             fig = self
-        corner.corner(data=data, bins=bins, range=range, axes_scale=axes_scale, weights=weights,
-                        color=color, hist_bin_factor=hist_bin_factor,
-                        smooth=smooth, smooth1d=smooth1d, labels=labels, label_kwargs=label_kwargs,
-                        titles=titles, show_titles=show_titles, title_quantiles=title_quantiles,
-                        title_fmt=title_fmt, title_kwargs=title_kwargs, truths=truths, truth_color=truth_color,
-                        scale_hist=scale_hist, quantiles=quantiles, verbose=verbose, fig=fig, max_n_ticks=max_n_ticks,
-                        top_ticks=top_ticks, use_math_text=use_math_text, reverse=reverse, labelpad=labelpad,
-                        hist_kwargs=hist_kwargs, group=group, var_names=var_names, filter_vars=filter_vars,
-                        coords=coords, divergences=divergences, divergences_kwargs=divergences_kwargs,
-                        labeller=labeller, hist2d_kwargs=hist2d_kwargs)
+        corner.corner(
+            data=data,
+            bins=bins,
+            range=range,
+            axes_scale=axes_scale,
+            weights=weights,
+            color=color,
+            hist_bin_factor=hist_bin_factor,
+            smooth=smooth,
+            smooth1d=smooth1d,
+            labels=labels,
+            label_kwargs=label_kwargs,
+            titles=titles,
+            show_titles=show_titles,
+            title_quantiles=title_quantiles,
+            title_fmt=title_fmt,
+            title_kwargs=title_kwargs,
+            truths=truths,
+            truth_color=truth_color,
+            scale_hist=scale_hist,
+            quantiles=quantiles,
+            verbose=verbose,
+            fig=fig,
+            max_n_ticks=max_n_ticks,
+            top_ticks=top_ticks,
+            use_math_text=use_math_text,
+            reverse=reverse,
+            labelpad=labelpad,
+            hist_kwargs=hist_kwargs,
+            group=group,
+            var_names=var_names,
+            filter_vars=filter_vars,
+            coords=coords,
+            divergences=divergences,
+            divergences_kwargs=divergences_kwargs,
+            labeller=labeller,
+            hist2d_kwargs=hist2d_kwargs,
+        )
         return
-    
-    def taylor_plot(self, ax, reference, simulations, Normalize=False, markers=[], colors=[], scale=1.5,
-                    markersize=2, pkwargs={}, reference_name='Observations', simulations_name=None,
-                    legend=False, r_linewidth=1, r_linecolor='k', r_linestyle='--', ref_std_linewidth=1.5,
-                    ref_std_linecolor='k', ref_std_linestyle='-', rmse_linewidth=0.75, rmse_linecolor='grey',
-                    rmse_linestyle='--'):
-        TaylorDiagram(ax, reference, simulations, Normalize=Normalize, markers=markers,
-                      colors=colors, scale=scale, markersize=markersize, pkwargs=pkwargs,
-                      reference_name=reference_name, simulations_name=simulations_name, legend=legend,
-                      r_linewidth=r_linewidth, r_linecolor=r_linecolor,
-                      r_linestyle=r_linestyle, ref_std_linewidth=ref_std_linewidth,
-                      ref_std_linecolor=ref_std_linecolor, ref_std_linestyle=ref_std_linestyle,
-                      rmse_linewidth=rmse_linewidth, rmse_linecolor=rmse_linecolor, rmse_linestyle=rmse_linestyle)
 
-  
-if __name__ == "__main__":  
+    def taylor_plot(
+        self,
+        ax,
+        reference,
+        simulations,
+        Normalize=False,
+        markers=[],
+        colors=[],
+        scale=1.5,
+        markersize=2,
+        pkwargs={},
+        reference_name="Observations",
+        simulations_name=None,
+        legend=False,
+        r_linewidth=1,
+        r_linecolor="k",
+        r_linestyle="--",
+        ref_std_linewidth=1.5,
+        ref_std_linecolor="k",
+        ref_std_linestyle="-",
+        rmse_linewidth=0.75,
+        rmse_linecolor="grey",
+        rmse_linestyle="--",
+    ):
+        TaylorDiagram(
+            ax,
+            reference,
+            simulations,
+            Normalize=Normalize,
+            markers=markers,
+            colors=colors,
+            scale=scale,
+            markersize=markersize,
+            pkwargs=pkwargs,
+            reference_name=reference_name,
+            simulations_name=simulations_name,
+            legend=legend,
+            r_linewidth=r_linewidth,
+            r_linecolor=r_linecolor,
+            r_linestyle=r_linestyle,
+            ref_std_linewidth=ref_std_linewidth,
+            ref_std_linecolor=ref_std_linecolor,
+            ref_std_linestyle=ref_std_linestyle,
+            rmse_linewidth=rmse_linewidth,
+            rmse_linecolor=rmse_linecolor,
+            rmse_linestyle=rmse_linestyle,
+        )
+
+
+if __name__ == "__main__":
     fig = Figure()
     ax = fig.add_axes_cm("Test", 2, 1, 6, 6)
     import pandas as pd
-    df = pd.DataFrame({"a": [1, 2, 3, 4, 5], "b": [2, 3, 4, 7, 6], "c": [2, 3, 4, 6, 9]})
+
+    df = pd.DataFrame(
+        {"a": [1, 2, 3, 4, 5], "b": [2, 3, 4, 7, 6], "c": [2, 3, 4, 6, 9]}
+    )
 
     # ax2 = fig.add_axes_cm("Demo", 3, 4, 3, 4)
     fig.taylor_plot(ax, df.iloc[:, 0].values, df.iloc[:, 1:].values)
